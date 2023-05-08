@@ -1,1 +1,140 @@
-mir.mincoding.co.kr
+import java.io.*;
+import java.util.*;
+
+class Main {
+
+	private final static int CMD_REGISTER 	= 1;
+	private final static int CMD_INOUT	 	= 2;
+
+	private static boolean run(BufferedReader br) throws IOException {
+
+		StringTokenizer st;
+		st = new StringTokenizer(br.readLine());
+		int Q = Integer.parseInt(st.nextToken());
+
+		usersolution.init();
+
+		boolean isCorrect = true; 
+		int cmd; 
+		int id;
+		String name; 
+
+		for (int i = 0; i < Q; i++) {
+			st = new StringTokenizer(br.readLine());
+			cmd = Integer.parseInt(st.nextToken());
+			switch(cmd) 
+			{
+				case CMD_REGISTER:
+					id = Integer.parseInt(st.nextToken());
+					name = st.nextToken();
+					String userAns1 = usersolution.register(id, name);
+					String ans1 = st.nextToken();
+					if(!userAns1.equals(ans1)) 
+						isCorrect = false; 
+					break;
+	
+				case CMD_INOUT:
+					id = Integer.parseInt(st.nextToken());
+					String[] userAns2 = usersolution.inout(id); 
+					String a1 = st.nextToken();
+					String a2 = st.nextToken();  
+					if (!userAns2[0].equals(a1) || !userAns2[1].equals(a2)) 
+						isCorrect = false;
+					break;
+	
+				default:
+					isCorrect = false;
+					break;
+			}
+		}
+		return isCorrect;
+	}
+
+	private final static UserSolution usersolution = new UserSolution();
+//	private final static Main usersolution = new Main();
+
+	public static void main(String[] args) throws Exception {
+
+		// System.setIn(new java.io.FileInputStream("res/sample_input.txt"));
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+
+		int TC = Integer.parseInt(st.nextToken());
+		int MARK = Integer.parseInt(st.nextToken());
+
+		for (int testcase = 1; testcase <= TC; testcase++) {
+			int score = run(br) ? MARK : 0;
+			System.out.println("#" + testcase + " " + score);
+		}
+
+		br.close();
+	}
+}
+
+class UserSolution {
+//public class Main { 
+	
+	static String name [] = new String [ 9999 + 1]; //  id : 회원 번호 (1 <= id <= 9999)
+	static String inOut [] = new String [ 9999 + 1]; // 출퇴근 (처음등록은 퇴근)
+	
+	private final static int MAXNUM = 9999; 
+	
+	// 초기화 함수 //해당 함수는 최대 1,000,000번 호출됩니다.
+	public void init() 
+	{
+		this.name =  new String [ 9999 + 1];
+		this.inOut =  new String [ 9999 + 1];
+		
+	}
+/*
+id번의 사번을 name 이름의 사원과 매핑하여 저장하는 함수입니다.
+id : 회원 번호 (1 <=  id <= 9999)
+name : 회원 이름 (String, 최대 20글자, 영문 대문자로 주어집니다)
+등록 가능한 사번과 이름이라면, "OK"를 반환합니다.
+이미 사용되고 있는 사번이라면, "ERROR"를 반환합니다.
+해당 함수는 최대 1,000,000번 호출됩니다. 
+ * */
+	public String register(int id, String name)
+	{
+		String rst = "";
+//		등록 가능한 사번과 이름이라면, "OK"를 반환합니다.
+//		이미 사용되고 있는 사번이라면, "ERROR"를 반환합니다.
+		if ( this.name[id] == null  ) {
+			this.name[id] = name;
+			this.inOut[id] = "OUT";
+			rst =  "OK";
+		}else {
+			rst  = "ERROR";
+		}
+		return rst; 
+	}
+/*
+id번의 사번으로 등록된 사원의 출퇴근 기록을 하는 함수입니다. 
+id : 회원 번호 (1 <= id <= 9999)
+반환해야 하는 String 배열의 의 구성은 다음과 같습니다. 
+첫번째 값 : id번 사번에 해당하는 사원의 이름 
+두번째 값 : 해당 사원이 [퇴근] 상태 -> [출근] 상태라면 "IN", [출근] 상태 -> [퇴근] 상태라면 "OUT"
+등록이 되지 않은 사원이라면 아래와 같은 구성의 String 배열을 반환합니다. 
+첫번째 값 : "ERROR"
+두번째 값 : "ERROR"
+ * */
+	public String[] inout(int id)
+	{
+		String rst [] = new String[] {"", ""}; 
+		if ( this.name[id]  == null ) {
+			rst[0] = "ERROR";
+			rst[1] = "ERROR";
+		} else{
+//			System.out.println( this.name[id] + "=>" + this.inOut[id]);
+			
+			rst[0] = this.name[id]; // 이름 리턴
+			String state =  ( this.inOut[id].equals( "OUT") )  ? "IN" : "OUT" ;  
+			this.inOut[id] = state;
+			rst[1] = state;
+			
+//			System.out.println( this.name[id] + "=>" + this.inOut[id]);	
+		}
+		return rst; 
+	}
+}
